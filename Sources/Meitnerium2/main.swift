@@ -1,23 +1,15 @@
-import Prorsum
 import Foundation
+import Prorsum
 
-let server = try! HTTPServer { (request, writer) in
-    do {
-        let response = Response(
-            headers: ["Server": "Prorsum Micro HTTP Server"],
-            body: .buffer("hello".data)
-        )
-        
-        try writer.serialize(response)
-        
-        writer.close()
-    } catch {
-        fatalError("\(error)")
-    }
+var app = Meitnerium()
+
+app.addRoute(method: .get, path: "/") { request, response in
+    response.status = .ok
+    response.body = .buffer("Hello World".data)
 }
 
+let server = try! HTTPServer(app.responder)
 try! server.bind(host: "0.0.0.0", port: 3000)
-print("Server listening at 0.0.0.0:3000")
 try! server.listen()
 
 RunLoop.main.run()
