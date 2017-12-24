@@ -11,8 +11,24 @@ import Prorsum
 typealias Respond = (Request, ResponrWriter) -> ()
 
 extension Request.Method: Equatable {
+    
+    var code: Int {
+        switch self {
+        case .delete: return 0
+        case .get: return 1
+        case .head: return 2
+        case .post: return 3
+        case .put: return 4
+        case .connect: return 5
+        case .options: return 6
+        case .trace: return 7
+        case .patch: return 28
+        default: return 99
+        }
+    }
+    
     static public func ==(l: Request.Method, r: Request.Method) -> Bool {
-        return l == r
+        return l.code == r.code
     }
 }
 
@@ -40,7 +56,12 @@ final class Meitnerium: RouteAppendable {
 
             for route in self.routes {
                 if route.method.contains(request.method) && route.path == request.url.path {
-                    route.handler(request, response)
+                    route.handler(request, &response)
+                    print(response.body.isBuffer)
+                    print(response.body.isEmpty)
+                    print(response.body.isReader)
+                    print(response.body.isWriter)
+                    print(response.body)
                     try writer.serialize(response)
                     writer.close()
                     return

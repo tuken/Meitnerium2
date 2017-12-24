@@ -14,7 +14,7 @@ extension Request {
     }
 }
 
-public typealias Responder = (Request, Response) -> ()
+public typealias Responder = (Request, inout Response) -> ()
 
 struct Route {
     let path: String
