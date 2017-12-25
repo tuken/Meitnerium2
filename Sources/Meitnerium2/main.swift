@@ -1,11 +1,10 @@
 import Foundation
 import Prorsum
 
-var app = Meitnerium()
+var app = HTTPService()
 
-app.addRoute(method: .get, path: "/") { request, response in
-    response.status = .ok
-    response.body = .buffer("Hello World".data)
+app.addRoute(method: .get, path: "/") { request in
+    return Response(status: .ok, body: "Hello World".data)
 }
 
 let server = try! HTTPServer(app.responder)
