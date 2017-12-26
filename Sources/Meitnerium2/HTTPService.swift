@@ -64,6 +64,8 @@ extension RouteAppendable {
 
 final class HTTPService: RouteAppendable {
     
+    private let format = DateFormatter()
+    
     var routes: [Route] = []
 
     lazy var responder: (Request, ResponrWriter) -> Void = { request, writer in
@@ -71,6 +73,8 @@ final class HTTPService: RouteAppendable {
             for route in self.routes {
                 if route.method.contains(request.method) && route.path == request.url.path {
                     var response = route.handler(request)
+                    response.headers.headers["Date"] = self.format.string(from: Date())
+                    response.headers.headers["Server"] = "Secual Home Api Server/3.0"
                     try writer.serialize(response)
                     writer.close()
                     return
@@ -85,6 +89,14 @@ final class HTTPService: RouteAppendable {
         catch {
             fatalError("\(error)")
         }
+    }
+
+    init() {
+        self.format.dateFormat = "E, d MMM yyyy hh:mm:ss z"
+//        self.format.timeStyle = .long
+//        self.format.dateStyle = .long
+        self.format.locale = Locale(identifier: "en_UK")
+        self.format.timeZone = TimeZone(identifier: "UTC")
     }
     
     func addedRoute(method: Request.Method, path: String, _ responder: @escaping Responder) -> HTTPService {
