@@ -70,19 +70,17 @@ final class HTTPService: RouteAppendable {
 
     lazy var responder: (Request, ResponrWriter) -> Void = { request, writer in
         do {
+            var response = Response(status: .notFound)
+
             for route in self.routes {
                 if route.method.contains(request.method) && route.path == request.url.path {
-                    var response = route.handler(request)
-                    response.headers.headers["Date"] = self.format.string(from: Date())
-                    response.headers.headers["Server"] = "Secual Home Api Server/3.0"
-                    try writer.serialize(response)
-                    writer.close()
-                    return
+                    response = route.handler(request)
+                    break
                 }
             }
             
-            var response = Response()
-            response.status = .notFound
+            response.headers.headers["Date"] = self.format.string(from: Date())
+            response.headers.headers["Server"] = "Secual Home Api Server/3.0"
             try writer.serialize(response)
             writer.close()
         }
@@ -93,8 +91,6 @@ final class HTTPService: RouteAppendable {
 
     init() {
         self.format.dateFormat = "E, d MMM yyyy hh:mm:ss z"
-//        self.format.timeStyle = .long
-//        self.format.dateStyle = .long
         self.format.locale = Locale(identifier: "en_UK")
         self.format.timeZone = TimeZone(identifier: "UTC")
     }
