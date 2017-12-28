@@ -10,17 +10,18 @@ import Prorsum
 
 public struct AccountsHandler {
     
-    public static func list(_: Request) -> Response {
+    public static func list(_: Request) -> (Response.Status, [String : Any]) {
         let results = try! knex.table("accounts").fetch()
         if let accounts = results {
             do {
-                let json = try accounts.jsonEncodedString()
-                return Response(status: .ok, body: )
+//                let json = try accounts.jsonEncodedString()
+                return try (.ok, Account(row: accounts[0]).serialize())
             }
             catch {
 //                Log.error(message: "cannot encode json: \(error)")
-                return Response(status: .internalServerError)
+                return (.internalServerError, [:])
             }
         }
+        return (.internalServerError, [:])
     }
 }
