@@ -76,11 +76,10 @@ final class HTTPService: RouteAppendable {
             for route in self.routes {
                 if route.method.contains(request.method) && route.path == request.url.path {
                     let res = route.handler(request)
-                    response.status = res.0
-                    print(res)
                     let jobj = JSON(res.1 as Any)
+                    response = Response(status: res.0, body: .buffer(jobj.description.data))
+                    print(res)
                     print(jobj)
-                    response.body = .buffer(jobj.description.data)
                     print(response.body)
                     break
                 }

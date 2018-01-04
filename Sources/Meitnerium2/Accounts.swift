@@ -28,10 +28,10 @@ struct Account: Entity, Serializable {
     let max_devices_per_home: UInt16
     let agree: UInt8
     let expired: String?
-    let user_agent: UInt8
-//    let last_signin_at: String?
-//    let updated_at: String
-//    let created_at: String
+    let user_agent: UInt8?
+    let last_signin_at: Date?
+    let updated_at: Date
+    let created_at: Date
     
     init(row: Row) throws {
         self.id = row["id"] as! UInt
@@ -52,10 +52,10 @@ struct Account: Entity, Serializable {
         self.max_devices_per_home = row["max_devices_per_home"] as! UInt16
         self.agree = row["agree"] as! UInt8
         self.expired = row["expired"] as? String
-        self.user_agent = row["user_agent"] as! UInt8
-//        self.last_signin_at = row["last_signin_at"] as? String
-//        self.updated_at = row["updated_at"] as! String
-//        self.created_at = row["created_at"] as! String
+        self.user_agent = row["user_agent"] as? UInt8
+        self.last_signin_at = row["last_signin_at"] as? Date
+        self.updated_at = row["updated_at"] as! Date
+        self.created_at = row["created_at"] as! Date
     }
     
     func serialize() throws -> [String: Any] {
@@ -78,10 +78,10 @@ struct Account: Entity, Serializable {
             "max_devices_per_home": self.max_devices_per_home,
             "agree": self.agree,
             "expired": self.expired as Any,
-            "user_agent": self.user_agent,
-//            "last_signin_at": self.last_signin_at as Any,
-//            "updated_at": self.updated_at,
-//            "created_at": self.created_at,
+            "user_agent": self.user_agent as Any,
+            "last_signin_at": self.last_signin_at as Any,
+            "updated_at": self.updated_at,
+            "created_at": self.created_at,
         ]
     }
 }
