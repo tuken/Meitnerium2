@@ -9,16 +9,16 @@
 import Foundation
 import SwiftKnex
 
-struct Account: Entity, Serializable {
+class Account: Model {
     let id: UInt
-    let account_id: String
-    let email: String
+    var account_id: String
+    var email: String
     let password: String
     let first_name: String
     let last_name: String
     let zip: String?
     let address: String?
-    let tel: String?
+    var tel: String?
     let mobile_tel: String?
     let avatar: String?
     let parent_id: UInt32?
@@ -33,7 +33,7 @@ struct Account: Entity, Serializable {
     let updated_at: Date
     let created_at: Date
     
-    init(row: Row) throws {
+    required init(row: Row) throws {
         self.id = row["id"] as! UInt
         self.account_id = row["account_id"] as! String
         self.email = row["email"] as! String
@@ -56,32 +56,10 @@ struct Account: Entity, Serializable {
         self.last_signin_at = row["last_signin_at"] as? Date
         self.updated_at = row["updated_at"] as! Date
         self.created_at = row["created_at"] as! Date
+        try super.init(row: row)
     }
     
-    func serialize() throws -> [String: Any] {
-        return [
-            "id": self.id,
-            "account_id": self.account_id,
-            "email": self.email,
-            "password": self.password,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "zip": self.zip as Any,
-            "address": self.address as Any,
-            "tel": self.tel as Any,
-            "mobile_tel": self.mobile_tel as Any,
-            "avatar": self.avatar as Any,
-            "parent_id": self.parent_id as Any,
-            "gmo_member_id": self.gmo_member_id as Any,
-            "status": self.status,
-            "max_users": self.max_users,
-            "max_devices_per_home": self.max_devices_per_home,
-            "agree": self.agree,
-            "expired": self.expired as Any,
-            "user_agent": self.user_agent as Any,
-            "last_signin_at": self.last_signin_at as Any,
-            "updated_at": self.updated_at,
-            "created_at": self.created_at,
-        ]
+    required init(from decoder: Decoder) throws {
+        fatalError("init(from:) has not been implemented")
     }
 }

@@ -9,7 +9,7 @@ import Foundation
 import Prorsum
 import SwiftyJSON
 
-public typealias Responder = (Request) -> (Response.Status, [String : Any])
+public typealias Responder = (Request) -> (Response.Status, Any)
 
 extension Request.Method: Equatable {
     
@@ -76,11 +76,26 @@ final class HTTPService: RouteAppendable {
             for route in self.routes {
                 if route.method.contains(request.method) && route.path == request.url.path {
                     let res = route.handler(request)
-                    let jobj = JSON(res.1 as Any)
-                    response = Response(status: res.0, body: .buffer(jobj.description.data))
-                    print(res)
-                    print(jobj)
-                    print(response.body)
+                    print("handler return {\(res)}")
+                    let encoder = JSONEncoder()
+                    encoder.outputFormatting = .prettyPrinted
+                    var encoded = Data()
+                    if let mod = res.1 as? Model {
+                        print("Model!")
+                        encoded = try! encoder.encode(mod)
+                    }
+                    else if let ary = res.1 as? [Model] {
+                        print("Codable array!")
+                        encoded = try! encoder.encode(ary)
+                    }
+                    else if let dic = res.1 as? [String:Model] {
+                        print("Codable dictionary!")
+                        encoded = try! encoder.encode(dic)
+                    }
+                    let jstr = String(data: encoded, encoding: .utf8)!
+                    print("JSON string {\(jstr)}")
+                    response = Response(status: res.0, body: .buffer(jstr.data))
+                    print("response body {\(response.body)}")
                     break
                 }
             }

@@ -3,7 +3,13 @@ import Prorsum
 import SwiftKnex
 import SwiftyJSON
 
-let config = KnexConfig(host: "localhost", user: "root", password: "secualpass", database: "secual", isShowSQLLog: true)
+class Model: Entity, Codable {
+
+    required init(row: Row) throws {
+    }
+}
+
+let config = KnexConfig(host: "localhost", user: "root", database: "secual", isShowSQLLog: true)
 let con = try! KnexConnection(config: config)
 let knex = con.knex()
 

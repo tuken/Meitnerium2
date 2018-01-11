@@ -10,12 +10,12 @@ import Prorsum
 
 public struct AccountsHandler {
     
-    public static func list(_: Request) -> (Response.Status, [String : Any]) {
+    public static func list(_: Request) -> (Response.Status, Any) {
         let results = try! knex.table("accounts").fetch()
         if let accounts = results {
 //            do {
 //                let json = try accounts.jsonEncodedString()
-                return (.ok, ["accounts" : accounts])
+            return (.ok, try! Account(row: accounts[0]))
 //            }
 //            catch {
 //                Log.error(message: "cannot encode json: \(error)")
