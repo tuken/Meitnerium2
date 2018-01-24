@@ -2,6 +2,8 @@ import Foundation
 import Prorsum
 import SwiftKnex
 
+typealias Model = Entity & Codable & Jsonizable
+
 var logger = FileLogger()
 logger.fileName = "./Meitnerium2.log"
 

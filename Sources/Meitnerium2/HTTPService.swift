@@ -9,7 +9,7 @@ import Foundation
 import Prorsum
 import SwiftyJSON
 
-typealias Responder = (Request) -> (Response.Status, Model?)
+typealias Responder = (Request) -> (Response.Status, Any?)
 
 extension Request.Method: Equatable {
     
@@ -77,7 +77,11 @@ final class HTTPService: RouteAppendable {
                 if route.method.contains(request.method) && route.path == request.url.path {
                     let res = route.handler(request)
                     print("handler return {\(res)}")
-                    if let model = res.1 {
+                    if let model = res.1 as? Model {
+                        response = Response(status: res.0, body: .buffer(model.jsonize()))
+                        print("response body {\(response.body)}")
+                    }
+                    else if let model = res.1 as? [Model] {
                         response = Response(status: res.0, body: .buffer(model.jsonize()))
                         print("response body {\(response.body)}")
                     }

@@ -10,10 +10,11 @@ import Prorsum
 
 struct AccountsHandler {
     
-    static func list(_: Request) -> (Response.Status, Model?) {
+    static func list(_: Request) -> (Response.Status, Any?) {
         let results = try! knex.table("accounts").fetch()
         if let accounts = results {
-            return (.ok, try! Account(row: accounts[0]))
+            let accary = try! accounts.map { try Account(row: $0) }
+            return (.ok,  accary)
         }
         return (.internalServerError, nil)
     }
