@@ -8,20 +8,21 @@
 import Foundation
 import Prorsum
 
-public struct AccountsHandler {
+struct AccountsHandler {
     
-    public static func list(_: Request) -> (Response.Status, Any) {
+    static func list(_: Request) -> (Response.Status, Model?) {
         let results = try! knex.table("accounts").fetch()
         if let accounts = results {
-//            do {
-//                let json = try accounts.jsonEncodedString()
             return (.ok, try! Account(row: accounts[0]))
-//            }
-//            catch {
-//                Log.error(message: "cannot encode json: \(error)")
-//                return (.internalServerError, [:])
-//            }
         }
-        return (.internalServerError, [:])
+        return (.internalServerError, nil)
+    }
+    
+    static func detail(_: Request) -> (Response.Status, Model?) {
+        let results = try! knex.table("accounts").fetch()
+        if let accounts = results {
+            return (.ok, try! Account(row: accounts[0]))
+        }
+        return (.internalServerError, nil)
     }
 }

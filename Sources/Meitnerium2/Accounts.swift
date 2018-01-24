@@ -9,7 +9,7 @@
 import Foundation
 import SwiftKnex
 
-class Account: Model {
+struct Account: Model {
     let id: UInt
     var account_id: String
     var email: String
@@ -32,8 +32,8 @@ class Account: Model {
     let last_signin_at: Date?
     let updated_at: Date
     let created_at: Date
-    
-    required init(row: Row) throws {
+
+    init(row: Row) throws {
         self.id = row["id"] as! UInt
         self.account_id = row["account_id"] as! String
         self.email = row["email"] as! String
@@ -56,10 +56,5 @@ class Account: Model {
         self.last_signin_at = row["last_signin_at"] as? Date
         self.updated_at = row["updated_at"] as! Date
         self.created_at = row["created_at"] as! Date
-        try super.init(row: row)
-    }
-    
-    required init(from decoder: Decoder) throws {
-        fatalError("init(from:) has not been implemented")
     }
 }

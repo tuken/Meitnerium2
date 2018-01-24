@@ -9,7 +9,7 @@ import Foundation
 import Prorsum
 import SwiftyJSON
 
-public typealias Responder = (Request) -> (Response.Status, Any)
+typealias Responder = (Request) -> (Response.Status, Model?)
 
 extension Request.Method: Equatable {
     
@@ -77,25 +77,10 @@ final class HTTPService: RouteAppendable {
                 if route.method.contains(request.method) && route.path == request.url.path {
                     let res = route.handler(request)
                     print("handler return {\(res)}")
-                    let encoder = JSONEncoder()
-                    encoder.outputFormatting = .prettyPrinted
-                    var encoded = Data()
-                    if let mod = res.1 as? Model {
-                        print("Model!")
-                        encoded = try! encoder.encode(mod)
+                    if let model = res.1 {
+                        response = Response(status: res.0, body: .buffer(model.jsonize()))
+                        print("response body {\(response.body)}")
                     }
-                    else if let ary = res.1 as? [Model] {
-                        print("Codable array!")
-                        encoded = try! encoder.encode(ary)
-                    }
-                    else if let dic = res.1 as? [String:Model] {
-                        print("Codable dictionary!")
-                        encoded = try! encoder.encode(dic)
-                    }
-                    let jstr = String(data: encoded, encoding: .utf8)!
-                    print("JSON string {\(jstr)}")
-                    response = Response(status: res.0, body: .buffer(jstr.data))
-                    print("response body {\(response.body)}")
                     break
                 }
             }
@@ -117,21 +102,18 @@ final class HTTPService: RouteAppendable {
     }
     
     func addedRoute(method: Request.Method, path: String, _ responder: @escaping Responder) -> HTTPService {
-        let serv = HTTPService()
-        serv.routes.append(Route(method: method, path: path, handler: responder))
-        return serv
+        self.routes.append(Route(method: method, path: path, handler: responder))
+        return self
     }
     
     func addedRoute(methods: [Request.Method], path: String, _ responder: @escaping Responder) -> HTTPService {
-        let serv = HTTPService()
-        serv.routes.append(Route(methods: methods, path: path, handler: responder))
-        return serv
+        self.routes.append(Route(methods: methods, path: path, handler: responder))
+        return self
     }
     
     func addedRoute(path: String, _ responder: @escaping Responder) -> HTTPService {
-        let serv = HTTPService()
-        serv.routes.append(Route(path: path, handler: responder))
-        return serv
+        self.routes.append(Route(path: path, handler: responder))
+        return self
     }
 }
 
