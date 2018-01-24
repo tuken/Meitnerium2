@@ -91,7 +91,7 @@ final class HTTPService: RouteAppendable {
             writer.close()
         }
         catch {
-            fatalError("\(error)")
+            logger.critical("responder error: {\(error)}")
         }
     }
 

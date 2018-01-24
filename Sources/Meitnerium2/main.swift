@@ -1,35 +1,9 @@
 import Foundation
 import Prorsum
 import SwiftKnex
-import SwiftyJSON
 
-protocol Jsonizable {
-
-    func jsonize() -> Data
-}
-
-typealias Model = Entity & Codable & Jsonizable
-
-extension Jsonizable where Self: Model {
-    
-    func jsonize() -> Data {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
-        let format = DateFormatter()
-//        format.locale = Locale(identifier: "ja_JP")
-//        format.timeZone = TimeZone(identifier: "Asia/Tokyo")
-        format.dateFormat = "YYYY-MM-dd HH:mm:ss z"
-        encoder.dateEncodingStrategy = .formatted(format)
-        do {
-            return try encoder.encode(self)
-        }
-        catch {
-            print("jsonize error: {\(error)}")
-        }
-        
-        return Data()
-    }
-}
+var logger = FileLogger()
+logger.fileName = "./Meitnerium2.log"
 
 let config = KnexConfig(host: "localhost", user: "root", database: "secual", isShowSQLLog: true)
 let con = try! KnexConnection(config: config)
