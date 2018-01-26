@@ -13,6 +13,8 @@ protocol Jsonizable {
     func jsonize() -> Data
 }
 
+typealias Model = Entity & Codable & Jsonizable
+
 extension Jsonizable where Self: Model {
     
     func jsonize() -> Data {

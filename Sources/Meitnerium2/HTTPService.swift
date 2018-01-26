@@ -85,6 +85,9 @@ final class HTTPService: RouteAppendable {
                         response = Response(status: res.0, body: .buffer(model.jsonize()))
                         print("response body {\(response.body)}")
                     }
+                    else {
+                        response = Response(status: res.0, body: .buffer(Data()))
+                    }
                     break
                 }
             }
