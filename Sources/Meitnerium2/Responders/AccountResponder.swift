@@ -12,27 +12,32 @@ import TurnstileCrypto
 struct AccountResponder {
     
     static func new(request: Request) -> (Response.Status, Any?) {
-        switch request.body {
-        case let .buffer(body):
-            if let params = try? JSONDecoder().decode(NewAccountRequest.self, from: body.data) {
-                let token = makeToken()
-                let passwd = BCrypt.hash(password: params.password)
+        if let params = try? JSONDecoder().decode(NewAccountRequest.self, from: request.bodyData) {
+            let token = makeToken()
+            let passwd = BCrypt.hash(password: params.password)
 
-                do {
-                    var values: [String : Any] = ["email": params.email, "password": passwd, "first_name": params.first_name, "last_name": params.last_name, "token": token, "expiry": Date(timeIntervalSinceNow: 86400)]
-                    if let zip = params.zip { values["zip"] = zip }
-                    if let address = params.address { values["address"] = address }
-                    if let tel = params.tel { values["tel"] = tel }
-                    if let mobile_tel = params.mobile_tel { values["mobile_tel"] = mobile_tel }
-                    let results = try knex.insert(into: "account_temporaries", values: values)
-                    print("new account: \(results.affectedRows) \(results.insertId)")
-                    return (.created, nil)
-                }
-                catch {
-                    print(error)
-                }
+            do {
+                var values: [String : Any] = ["email": params.email, "password": passwd, "first_name": params.first_name, "last_name": params.last_name, "token": token, "expiry": Date(timeIntervalSinceNow: 86400)]
+                if let zip = params.zip { values["zip"] = zip }
+                if let address = params.address { values["address"] = address }
+                if let tel = params.tel { values["tel"] = tel }
+                if let mobile_tel = params.mobile_tel { values["mobile_tel"] = mobile_tel }
+                let results = try knex.insert(into: "account_temporaries", values: values)
+                logger.debug("new account: \(results.affectedRows) \(results.insertId)")
+                
+                let url = URL(string: "http://localhost:9000/v1/mail/newaccount")
+                let client = try HTTPClient(url: url!)
+                try client.open()
+                let headers: Headers = ["User-Agent": "SCL-API-SERVER/4.0"]
+                var req = NewAccountMailRequest()
+                req.id = UInt(results.insertId)
+                let encoder = JSONEncoder()
+                _ = try client.request(method: .post, headers: headers, body: encoder.encode(req))
+                return (.created, nil)
             }
-        default: break
+            catch {
+                logger.error("\(#function): failed to insert account_temporaries: \(error)")
+            }
         }
         return (.internalServerError, nil)
     }

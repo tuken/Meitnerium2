@@ -76,14 +76,14 @@ final class HTTPService: RouteAppendable {
             for route in self.routes {
                 if route.method.contains(request.method) && route.path == request.url.path {
                     let res = route.handler(request)
-                    print("handler return {\(res)}")
+                    logger.debug("handler return {\(res)}")
                     if let model = res.1 as? Model {
                         response = Response(status: res.0, body: .buffer(model.jsonize()))
-                        print("response body {\(response.body)}")
+                        logger.debug("response body {\(response.body)}")
                     }
                     else if let model = res.1 as? [Model] {
                         response = Response(status: res.0, body: .buffer(model.jsonize()))
-                        print("response body {\(response.body)}")
+                        logger.debug("response body {\(response.body)}")
                     }
                     else {
                         response = Response(status: res.0, body: .buffer(Data()))

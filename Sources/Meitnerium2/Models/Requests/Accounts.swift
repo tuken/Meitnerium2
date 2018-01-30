@@ -25,3 +25,8 @@ struct NewAccountRequest: Decodable {
     
     var mobile_tel: String? = nil
 }
+
+struct NewAccountMailRequest: Encodable {
+    
+    var id: UInt = 0
+}

@@ -2,14 +2,17 @@ import Foundation
 import Prorsum
 import SwiftKnex
 
-//extension Request {
-//
-//    var bodyParams: [String:Any] {
-//        get {
-//
-//        }
-//    }
-//}
+extension Request {
+
+    var bodyData: Data {
+        get {
+            switch self.body {
+            case let .buffer(body): return body
+            default: return Data()
+            }
+        }
+    }
+}
 
 func makeToken() -> String {
     let ran = Data(URandom().bytes(30))
